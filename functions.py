@@ -26,6 +26,17 @@ def mse_loss(y_pred, y_true):
     mse_loss = np.sum((y_pred - y_true) ** 2) / 2 #(2*n)
     return mse_loss
 
+def rnn_loss(y_true, y_pred):
+    #N = len(y_pred)
+    loss = 0 
+    for t in reversed(range(len(y_pred))):
+        loss += -np.mean(np.log(y_pred[t]+1e-12) * y_true[t]) 
+    return loss #(-1 * y_true * np.log(y_pred)) / N 
+
+def rnn_loss_derivative(y_true, y_pred):
+    N = len(y_pred)
+    return y_pred - y_true 
+
 def mse_derivative(y_true, y_pred): 
     n = len(y_pred)
     #return -2 * np.sum(y_true - y_pred) / n

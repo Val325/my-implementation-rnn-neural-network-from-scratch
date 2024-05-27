@@ -13,7 +13,7 @@ seed = None if random_state is None else int(random_state)
 rng = np.random.default_rng(seed=seed)
 
 with open("dataset/shakespeare.txt") as data:
-    text_data = data.read()[0:700].lower()
+    text_data = data.read()[0:500].lower()
 
 print("data: ", text_data)
 tokens = word_tokenize(text_data)
@@ -106,8 +106,8 @@ class NeuralNetworkRecurrent:
 
 
     def backpropogation(self, x, y, i):
-        delta = mse_derivative(y, x) #* deriv_sigmoid(self.z2)         
-
+        delta = rnn_loss_derivative(y, x) #* deriv_sigmoid(self.z2)         
+        #print("delta: ", delta)
         grad_w2 = delta  
 
         grad_b2 = delta
@@ -144,7 +144,7 @@ class NeuralNetworkRecurrent:
         #print("all: ", all_train)
         size_data = len(x)
         all_pred = []
-        batch_size = 64
+        batch_size = 16
         #print("all: ", all_train[:batch])
         #print("num: iter: ", round(size_data / batch))
         num_batch = round(size_data / batch_size) 
@@ -165,8 +165,8 @@ class NeuralNetworkRecurrent:
                 #print("y: ", y[index])
                     all_pred.append(np.array(pred))
                     self.backpropogation(pred, y_batch[i][0][0], index)
-                    error = mse_loss(pred, y_batch[i][0][0]) 
-                    print("error", error) 
+                    error = rnn_loss(pred, y_batch[i][0][0]) 
+                      
 
 
             all_pred = []
@@ -177,7 +177,7 @@ class NeuralNetworkRecurrent:
             print("--------------------")
             print("epoch: ", ep)
             print("times: ", self.num_times)
-            
+            print("error", error) 
                 #print("setosa: ", network.feedforward(np.array([5.1,3.5,1.4,0.2])))
                 #print("setosa argmax: ", np.argmax(np.asarray(network.feedforward(np.array([5.1,3.5,1.4,0.2])))))
                 #print("versicolor argmax: ", np.argmax(np.asarray(network.feedforward(np.array([5.5,2.5,4.0,1.3])))))
@@ -210,7 +210,7 @@ for i in range(len(tokens)):
         print("end processing")
     all_train.append(np.array(elem, dtype=object))
 
-network = NeuralNetworkRecurrent(0.05, 4, len(one_hot_encoded), 80, len(one_hot_encoded))
+network = NeuralNetworkRecurrent(0.1, 3, len(one_hot_encoded), 20, len(one_hot_encoded))
 
 try:
     #print("len(all_train) : ", len(all_train))
@@ -222,12 +222,12 @@ except IndexError:
 size_gen = 3
 text = ""
 text_data_pred = None
-start_word = one_hot_encoded[0][1]
-print("size start_word: ", len(start_word))
+start_word = one_hot_encoded[3][1]
+#print("size start_word: ", len(start_word))
 two_word = network.feedforward(start_word)
-print("two_word: ", two_word)
+#print("two_word: ", two_word)
 three_word = network.feedforward(two_word)
-print("three_word: ", three_word)
+#print("three_word: ", three_word)
 
 text = tokens[np.argmax(start_word)] + " " + tokens[np.argmax(two_word)] + " " + tokens[np.argmax(three_word)] 
 print("generate: ", text)
